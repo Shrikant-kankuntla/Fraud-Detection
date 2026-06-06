@@ -2,26 +2,22 @@ import streamlit as st
 import pandas as pd
 import joblib
 
-# Page config
 st.set_page_config(
     page_title="Fraud Detection System",
-    page_icon="🔍",
+    page_icon="",
     layout="centered"
 )
 
-# Load the saved model
 @st.cache_resource
 def load_model():
     return joblib.load("Fraud_detection_pipeline.pkl")
 
 model = load_model()
 
-# Title and description
 st.title("Fraud Detection System")
 st.write("Enter the transaction details below to check if it is fraudulent or normal.")
 st.divider()
 
-# Input form
 st.subheader("Transaction Details")
 
 col1, col2 = st.columns(2)
@@ -84,10 +80,8 @@ with col2:
 
 st.divider()
 
-# Predict button
 if st.button("Check Transaction", use_container_width=True, type="primary"):
 
-    # Build the same features used during training
     balance_diff_orig = old_balance_orig - new_balance_orig
     balance_diff_dest = new_balance_dest - old_balance_dest
 
@@ -103,11 +97,9 @@ if st.button("Check Transaction", use_container_width=True, type="primary"):
         "balanceDiffDest": [balance_diff_dest]
     })
 
-    # Make prediction
     prediction = model.predict(input_data)[0]
     probability = model.predict_proba(input_data)[0][1]
 
-    # Show result
     st.subheader("Result")
 
     if prediction == 1:
@@ -122,7 +114,6 @@ if st.button("Check Transaction", use_container_width=True, type="primary"):
             "This transaction does not show signs of fraud based on the model."
         )
 
-    # Show fraud probability as a progress bar
     st.write("**Fraud Probability:**", f"{probability:.2%}")
     st.progress(float(probability))
 
@@ -134,6 +125,5 @@ if st.button("Check Transaction", use_container_width=True, type="primary"):
         st.write("**Receiver Balance Change:**", f"{balance_diff_dest:,.2f}")
         st.write("**Fraud Probability:**", f"{probability:.4f}")
 
-# Footer
 st.divider()
 st.caption("Model: Random Forest trained on the Fraud Detection dataset from Kaggle.")
